@@ -9,7 +9,8 @@ from yargy import (
 )
 from yargy.interpretation import (
     fact,
-    const
+    const,
+    attribute
 )
 from yargy.predicates import (
     eq, length_eq,
@@ -17,7 +18,7 @@ from yargy.predicates import (
     gram, type,
     normalized, caseless, dictionary
 )
-from yargy.pipelines import morph_pipeline
+from yargy.pipelines import morph_pipeline, caseless_pipeline
 
 from natasha.utils import Record
 
@@ -30,7 +31,7 @@ from natasha.dsl import (
 
 Money = fact(
     'Money',
-    ['integer', 'fraction', 'multiplier', 'currency', 'coins']
+    ['integer', 'fraction', 'multiplier', attribute('currency', 'RUB'), 'coins']
 )
 
 
@@ -178,6 +179,8 @@ MILLION = or_(
 
 THOUSAND = or_(
     rule(caseless('т'), DOT),
+    rule(caseless('к')),
+    rule(caseless('k')),
     rule(caseless('тыс'), DOT.optional()),
     rule(normalized('тысяча'))
 ).interpretation(
@@ -389,19 +392,19 @@ RANGE_MAX = rule(
         Range.max
     )
 )
-
-TAXATION = rule(dictionary({'чистыми', "грязными",
-                            # "до налогов", "после налогов",
-                            "gross", "гросс", 'net',
-                            # "до НДФЛ", "после НДФЛ",
-                            # "до вычета НДФЛ", "после вычета НДФЛ"
-                            }).interpretation(Range.taxation))
+# TODO: пока не работает
+TAXATION = rule(caseless_pipeline(['чистыми', "грязными",
+                                   # "до налогов", "после налогов", "на руки",
+                                   "gross", "гросс", 'net',
+                                   # "до НДФЛ", "после НДФЛ",
+                                   # "до вычета НДФЛ", "после вычета НДФЛ"
+                                   ]))
 
 RANGE = rule(
     RANGE_MIN,
     DASH.optional(),
     RANGE_MAX,
-    TAXATION.optional()
+    TAXATION.interpretation(Range.taxation).optional()
 ).interpretation(
     Range
 )

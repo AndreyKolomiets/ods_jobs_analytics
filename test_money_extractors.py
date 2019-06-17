@@ -10,13 +10,19 @@ ext = MoneyRangeExtractor()
 
 
 def test_pattern1():
-    text = 'от 60К до 300К'
+    text = 'от 60К до 300К грязными'
     matches = ext(text).as_json
     print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 60000
+    assert match['min']['currency'] == 'RUB'
+    assert match['max']['amount'] == 300000
+    assert match['max']['currency'] == 'RUB'
 
 
 def test_pattern5():
-    text = 'от 60к до 300к'
+    text = 'от 60к до 300к gross'
     matches = ext(text).as_json
     print(matches)
 
@@ -62,4 +68,5 @@ if __name__ == '__main__':
     test_pattern1()
     test_pattern2()
     test_pattern4()
+    test_pattern3()
 
