@@ -77,10 +77,11 @@ class Range(Range, Normalizable):
         min = self.min.normalized
         max = self.max.normalized
         # Приводим к одному масштабу (для вилок типа 150-250 т.р.)
-        if max.amount / min.amount > 10:
-            min.amount *= 1000
-        elif min.amount / max.amount > 10:
-            max.amount *= 1000
+        if (max.amount > 0) and (min.amount > 0):
+            if max.amount / min.amount > 10:
+                min.amount *= 1000
+            elif min.amount / max.amount > 10:
+                max.amount *= 1000
         if not min.currency:
             min.currency = max.currency
         return dsl.Range(min, max)
@@ -373,6 +374,7 @@ RATE = rule(
 DASH = eq('-')
 
 RANGE_MONEY = rule(
+    CURRENCY.optional(),
     AMOUNT,
     CURRENCY.optional()
 ).interpretation(

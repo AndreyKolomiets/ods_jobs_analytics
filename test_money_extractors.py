@@ -25,6 +25,12 @@ def test_pattern5():
     text = 'от 60к до 300к gross'
     matches = ext(text).as_json
     print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 60000
+    assert match['min']['currency'] == 'RUB'
+    assert match['max']['amount'] == 300000
+    assert match['max']['currency'] == 'RUB'
 
 
 def test_pattern2():
@@ -63,10 +69,12 @@ def test_pattern4():
     assert match['max']['currency'] == 'RUB'
 
 
+def test_phone():
+    text = '+7(495)6386767'
+    matches = ext(text)
+    assert len(matches) == 0
+
+
 if __name__ == '__main__':
-    test_pattern5()
-    test_pattern1()
-    test_pattern2()
-    test_pattern4()
-    test_pattern3()
+    pass
 
