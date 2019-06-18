@@ -17,14 +17,7 @@ from yargy.predicates import (
 )
 from yargy.pipelines import morph_pipeline, caseless_pipeline
 
-from natasha.utils import Record
-
 from natasha.extractors import Extractor
-
-from natasha.dsl import (
-    Normalizable,
-    money as dsl
-)
 
 Position = fact('position', ['level', 'field', 'name'])
 
@@ -32,12 +25,13 @@ LEVEL = rule(caseless_pipeline(['junior', 'middle', 'senior', 'lead', 'chief', '
 
 # TODO: нужно учесть head of (analytics, data science...)
 NAME = rule(or_(caseless_pipeline(['data scientist', 'data engineer', 'engineer',
-                               'analyst', 'data analyst',
-                               'data manager']),
+                                   'analyst', 'data analyst',
+                                   'data manager', 'scientist']),
                 rule(dictionary(['DS', 'DE']), is_capitalized())).interpretation(Position.name))
 
 FIELD = rule(caseless_pipeline(['ML', 'DL', 'CV', 'computer vision', 'NLP', 'bi',
-                                'machine learning', 'deep learning']).interpretation(Position.field))
+                                'machine learning', 'deep learning',
+                                'software', 'research']).interpretation(Position.field))
 
 POSITION = rule(LEVEL.optional(),
                 FIELD.optional(),
@@ -47,4 +41,3 @@ POSITION = rule(LEVEL.optional(),
 class PositionExtractor(Extractor):
     def __init__(self):
         super(PositionExtractor, self).__init__(POSITION)
-

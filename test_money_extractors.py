@@ -164,6 +164,3 @@ def test_fork():
     assert 'Вилка' in text[span[0]:span[1]]
 
 
-if __name__ == '__main__':
-    pass
-
