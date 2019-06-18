@@ -1,5 +1,5 @@
 from money_extractors import MoneyRangeExtractor
-
+# from natasha import MoneyRangeExtractor
 
 ext = MoneyRangeExtractor()
 # ['от 60К до 300К', '120т.р. - 160 т.р.',
@@ -145,6 +145,42 @@ def test_eur2():
 
 def test_eur3():
     text = '1K - 2K€ нетто '
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 1000
+    assert match['min']['currency'] == 'EUR'
+    assert match['max']['amount'] == 2000
+    assert match['max']['currency'] == 'EUR'
+
+
+def test_eur4():
+    text = '€1K - €2K EUR нетто '
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 1000
+    assert match['min']['currency'] == 'EUR'
+    assert match['max']['amount'] == 2000
+    assert match['max']['currency'] == 'EUR'
+
+
+def test_eur5():
+    text = '1K - 2K € нетто '
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 1000
+    assert match['min']['currency'] == 'EUR'
+    assert match['max']['amount'] == 2000
+    assert match['max']['currency'] == 'EUR'
+
+
+def test_eur6():
+    text = '1000 - 2000 € нетто '
     matches = ext(text).as_json
     print(matches)
     assert len(matches) != 0

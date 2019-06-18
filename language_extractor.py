@@ -1,6 +1,7 @@
 import re
 from itertools import chain
 from typing import List, Tuple, Set
+from natasha import MoneyRangeExtractor
 
 lang_emojis = {':r:': 'r', ':python:': 'python', ':cpp:': 'c++', ':scala:': 'scala', ':java:': 'java',
                ':golang:': 'scala', ':sql:': 'sql', ':matlab:':'matlab'}

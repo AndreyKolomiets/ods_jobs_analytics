@@ -98,11 +98,18 @@ INT = type('INT')
 ##########
 
 
+# EURO = or_(
+#     normalized('евро'),
+#     #in_(['€', 'EUR'])
+#     eq('€'),
+#     #eq('EUR')
+# ).interpretation(
+#     const(dsl.EURO)
+# )
+# EURO = caseless_pipeline(['евро', '€', 'eur'])#.interpretation(const(dsl.EURO))
 EURO = or_(
     normalized('евро'),
-    #in_(['€', 'EUR'])
-    eq('€'),
-    #eq('EUR')
+    eq('€')
 ).interpretation(
     const(dsl.EURO)
 )
