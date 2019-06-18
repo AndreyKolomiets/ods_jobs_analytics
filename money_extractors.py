@@ -85,6 +85,8 @@ class Range(Range, Normalizable):
                 max.amount *= 1000
         if not min.currency:
             min.currency = max.currency
+        elif min.currency != max.currency:
+            min.currency = max.currency
         return dsl.Range(min, max)
 
 
@@ -109,7 +111,8 @@ INT = type('INT')
 # EURO = caseless_pipeline(['евро', '€', 'eur'])#.interpretation(const(dsl.EURO))
 EURO = or_(
     normalized('евро'),
-    eq('€')
+    eq('€'),
+    eq('EUR')
 ).interpretation(
     const(dsl.EURO)
 )
@@ -412,7 +415,7 @@ TAXATION = rule(caseless_pipeline(['чистыми', "грязными",
                                    "до НДФЛ", "после НДФЛ",
                                    "до вычета НДФЛ", "после вычета НДФЛ"
                                    ]))
-FORK = rule(dictionary({'fork', 'Вилка', 'ЗП'}), eq(':'))
+FORK = rule(dictionary({'fork', 'Вилка', 'ЗП', 'Оклад'}), eq(':').optional())
 RANGE = rule(
     FORK.optional(),
     RANGE_MIN,
@@ -425,5 +428,25 @@ RANGE = rule(
 
 
 class MoneyRangeExtractor(Extractor):
+    regex_digits_only = re.compile('^\d+\s?-\s?\d+$')
+
     def __init__(self):
         super(MoneyRangeExtractor, self).__init__(RANGE)
+
+    def extract(self, text):
+        """
+        Фильтруем совпадения по условиям
+        :param text:
+        :return:
+        """
+        matches = self(text).as_json
+        res = []
+        for match in matches:
+            if 'fact' not in match:
+                continue
+            start, end = match['span'][0], match['span'][1]
+            if self.regex_digits_only.search(text[start:end]):
+                continue
+            res.append(match)
+        return res
+

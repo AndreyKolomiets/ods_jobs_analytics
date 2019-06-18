@@ -8,7 +8,7 @@ lang_emojis = {':r:': 'r', ':python:': 'python', ':cpp:': 'c++', ':scala:': 'sca
 language_patterns = {'scala': 'scala', 'java': 'java', 'джав[аоуе]й?': 'java', '[cс]\+\+': 'c++',
                      'python': 'python', 'питон[ауео]?м?': 'python', '[cс]#': 'c#', 'sql': 'sql',
                      'golang': 'golang', 'matlab': 'matlab', 'матлаб[ауео]?м?': 'matlab',
-                     '[\s]R[,.\s]': 'r'}
+                     '[\s]R[,.\s/]': 'r'}
 
 pattern_emojis = {re.compile(pattern): normalized for pattern, normalized in lang_emojis.items()}
 

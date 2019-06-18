@@ -112,6 +112,13 @@ def test_phone():
     assert (len(matches) == 0) or ('fact' not in matches[0])
 
 
+def test_phone2():
+    text = 'tel:+7(906)747-73-90'
+    matches = ext(text)
+    # assert len(matches) == 0
+    assert (len(matches) == 0) or ('fact' not in matches[0])
+
+
 def test_date():
     text = '2018/01/29'
     matches = ext(text)
