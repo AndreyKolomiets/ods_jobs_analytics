@@ -13,7 +13,7 @@ from yargy.predicates import (
     eq, length_eq,
     in_, in_caseless,
     gram, type,
-    normalized, caseless, dictionary
+    normalized, caseless, dictionary, is_capitalized
 )
 from yargy.pipelines import morph_pipeline, caseless_pipeline
 
@@ -28,15 +28,15 @@ from natasha.dsl import (
 
 Position = fact('position', ['level', 'field', 'name'])
 
-LEVEL = rule(caseless_pipeline(['junior', 'middle', 'senior', 'lead', 'chief']).interpretation(Position.level))
+LEVEL = rule(caseless_pipeline(['junior', 'middle', 'senior', 'lead', 'chief', 'head']).interpretation(Position.level))
 
-# TODO: тут нужен or_, чтобы писать DS и DE только большими буквами
-NAME = rule(caseless_pipeline(['data scientist', 'data engineer',
-                               'ds', 'de', 'engineer',
-                               'analyst', 'data analyst', 'bi analyst',
-                               'data manager']).interpretation(Position.name))
+# TODO: нужно учесть head of (analytics, data science...)
+NAME = rule(or_(caseless_pipeline(['data scientist', 'data engineer', 'engineer',
+                               'analyst', 'data analyst',
+                               'data manager']),
+                rule(dictionary(['DS', 'DE']), is_capitalized())).interpretation(Position.name))
 
-FIELD = rule(caseless_pipeline(['ML', 'DL', 'CV', 'NLP',
+FIELD = rule(caseless_pipeline(['ML', 'DL', 'CV', 'computer vision', 'NLP', 'bi',
                                 'machine learning', 'deep learning']).interpretation(Position.field))
 
 POSITION = rule(LEVEL.optional(),

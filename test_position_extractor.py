@@ -16,3 +16,9 @@ def test_ml_engineer():
     match = matches[0]
     assert match['fact']['name'].lower() == 'engineer'
     assert match['fact']['field'].lower() == 'machine learning'
+
+
+def test_de():
+    text = 'flag-de'
+    matches = ext(text).as_json
+    assert len(matches) == 0

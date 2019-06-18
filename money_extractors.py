@@ -1,4 +1,5 @@
 # coding: utf-8
+# TODO: для вилок типа 150-250 без к и валюты должно быть слово "вилка" или "fork" поблизости
 from __future__ import unicode_literals, division
 
 import re
@@ -99,14 +100,17 @@ INT = type('INT')
 
 EURO = or_(
     normalized('евро'),
-    eq('€')
+    #in_(['€', 'EUR'])
+    eq('€'),
+    #eq('EUR')
 ).interpretation(
     const(dsl.EURO)
 )
 
 DOLLARS = or_(
     normalized('доллар'),
-    eq('$')
+    eq('$'),
+    eq('USD')
 ).interpretation(
     const(dsl.DOLLARS)
 )
@@ -394,15 +398,16 @@ RANGE_MAX = rule(
         Range.max
     )
 )
-# TODO: пока не работает
+# TODO: пока не интерпретируется
 TAXATION = rule(caseless_pipeline(['чистыми', "грязными",
-                                   # "до налогов", "после налогов", "на руки",
-                                   "gross", "гросс", 'net',
-                                   # "до НДФЛ", "после НДФЛ",
-                                   # "до вычета НДФЛ", "после вычета НДФЛ"
+                                   "до налогов", "после налогов", "на руки",
+                                   "gross", "гросс", 'net', "нетто",
+                                   "до НДФЛ", "после НДФЛ",
+                                   "до вычета НДФЛ", "после вычета НДФЛ"
                                    ]))
-
+FORK = rule(dictionary({'fork', 'Вилка', 'ЗП'}), eq(':'))
 RANGE = rule(
+    FORK.optional(),
     RANGE_MIN,
     DASH.optional(),
     RANGE_MAX,

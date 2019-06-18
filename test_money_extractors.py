@@ -69,10 +69,99 @@ def test_pattern4():
     assert match['max']['currency'] == 'RUB'
 
 
+def test_usd():
+    text = '2.5-4.5k USD'
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 2500
+    assert match['min']['currency'] == 'USD'
+    assert match['max']['amount'] == 4500
+    assert match['max']['currency'] == 'USD'
+
+
+def test_usd2():
+    text = '2.5-4.5k $'
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 2500
+    assert match['min']['currency'] == 'USD'
+    assert match['max']['amount'] == 4500
+    assert match['max']['currency'] == 'USD'
+
+
+def test_usd3():
+    text = '2.5-4.5k$'
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 2500
+    assert match['min']['currency'] == 'USD'
+    assert match['max']['amount'] == 4500
+    assert match['max']['currency'] == 'USD'
+
+
 def test_phone():
     text = '+7(495)6386767'
     matches = ext(text)
-    assert len(matches) == 0
+    # assert len(matches) == 0
+    assert (len(matches) == 0) or ('fact' not in matches[0])
+
+
+def test_date():
+    text = '2018/01/29'
+    matches = ext(text)
+    # assert len(matches) == 0
+    assert (len(matches) == 0) or ('fact' not in matches[0])
+
+
+def test_eur():
+    text = '1K - 2K EUR нетто '
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 1000
+    assert match['min']['currency'] == 'EUR'
+    assert match['max']['amount'] == 2000
+    assert match['max']['currency'] == 'EUR'
+
+
+def test_eur2():
+    text = '1K - 2K € нетто '
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 1000
+    assert match['min']['currency'] == 'EUR'
+    assert match['max']['amount'] == 2000
+    assert match['max']['currency'] == 'EUR'
+
+
+def test_eur3():
+    text = '1K - 2K€ нетто '
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 1000
+    assert match['min']['currency'] == 'EUR'
+    assert match['max']['amount'] == 2000
+    assert match['max']['currency'] == 'EUR'
+
+
+def test_fork():
+    text = 'Вилка: от 60К до 300К грязными'
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    span = matches[0]['span']
+    assert 'Вилка' in text[span[0]:span[1]]
 
 
 if __name__ == '__main__':
