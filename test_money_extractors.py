@@ -1,8 +1,6 @@
 from money_extractors import MoneyRangeExtractor
 import pytest
-# from natasha import MoneyRangeExtractor
 
-ext = MoneyRangeExtractor()
 # ['от 60К до 300К', '120т.р. - 160 т.р.',
 #  'от 100 до 150', '$5k–$8k', 'от 2к до 4к Евро',
 #  '4000-5500 $', 'Вилка :fork:: 100-250 тысяч рублей на руки', '2-4k USD', '150-250 т.р. «чистыми»',
@@ -27,7 +25,10 @@ cases_fork = [('от 60К до 300К грязными', '60000 RUB-300000 RUB'),
               ('Зарплату от 200К до 1М рублей', '200000 RUB-1000000 RUB'),
               ('зп: 60 000 - 120 000 т.р. net', '60000 RUB-120000 RUB'),
               ('от 3,4 до 4,8 млн.рублей', '3400000 RUB-4800000 RUB'),
-              ('280-400+ тысяч рублей', '280000 RUB-400000 RUB')]
+              ('280-400+ тысяч рублей', '280000 RUB-400000 RUB'),
+              ('вилка $$1000-5000', '1000 USD-5000 USD'),
+              ('1000-2500k USD', '1000 USD-2500 USD'),
+              ('от $ 800 до 1100 net', '800 USD-1100 USD')]
 cases_not_fork = ['+7(495)6386767',
                   'tel:+7(906)747-73-90',
                   '2018/01/29',
@@ -35,7 +36,8 @@ cases_not_fork = ['+7(495)6386767',
                   'http://andrewgelman.com/2017/01/16/hiring-hiring-hiring-hiring/',
                   'Белая зп.: 150 000 рублей',
                   'График работы с 9:30 до 18:00',
-                  'мы планируем вырасти с 1,5 до 50 миллионов пользователей']
+                  'мы планируем вырасти с 1,5 до 50 миллионов пользователей',
+                  'Equity range: 0.25-1.5%']
 
 
 @pytest.fixture(scope='module')
@@ -60,9 +62,9 @@ def test_fork_not_present(extractor, test):
     assert len(matches) == 0
 
 
-def test_fork():
+def test_fork(extractor):
     text = 'Вилка: от 60К до 300К грязными'
-    matches = ext(text).as_json
+    matches = extractor(text).as_json
     print(matches)
     assert len(matches) != 0
     span = matches[0]['span']
