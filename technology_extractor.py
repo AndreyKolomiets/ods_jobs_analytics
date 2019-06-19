@@ -1,7 +1,7 @@
 import re
 from itertools import chain
 from typing import List, Tuple, Set
-
+# TODO: здесь может помочь предварительная токенизация
 lang_emojis = {':r:': 'r', ':python:': 'python', ':cpp:': 'c++', ':scala:': 'scala', ':java:': 'java',
                ':golang:': 'scala', ':sql:': 'sql', ':matlab:':'matlab'}
 language_patterns = {'scala': 'scala', 'java': 'java', 'джав[аоуе]й?': 'java', '[cс]\+\+': 'c++',
@@ -19,7 +19,7 @@ dl_frameworks = {'(py)?torch': 'pytorch',
                  'theano': 'theano', 'mxnet': 'mxnet', 'caffe2?': 'caffe'}
 
 bigdata = {'hadoop': 'hadoop', 'хадуп[аеоу]?м?': 'hadoop',
-           'hive': 'hive', 'flink': 'flink',
+           '\Whive': 'hive', 'flink': 'flink',
            'spark': 'spark', 'спарк[аеоу]?м?': 'spark',
            'kafka': 'kafka', 'кафк[аоуеи]й?': 'kafka', 'airflow': 'airflow',
            'mongo': 'mongodb', 'mongodb': 'mongodb', 'монго': 'mongodb',

@@ -79,6 +79,7 @@ class Range(Range, Normalizable):
         min = self.min.normalized
         max = self.max.normalized
         # Приводим к одному масштабу (для вилок типа 150-250 т.р.)
+        # TODO: иногда указывают миллионы (годовой доход в рублях), с ними не работает
         if (max.amount > 0) and (min.amount > 0):
             if max.amount / min.amount > 10:
                 min.amount *= 1000
@@ -192,7 +193,8 @@ MILLIARD = or_(
 
 MILLION = or_(
     rule(caseless('млн'), DOT.optional()),
-    rule(normalized('миллион'))
+    rule(normalized('миллион')),
+    rule(in_('мМmM'))
 ).interpretation(
     const(10 ** 6)
 )
@@ -312,7 +314,7 @@ AMOUNT = rule(
         FRACTION
     ).optional(),
     MULTIPLIER.optional(),
-    NUMERAL.optional()
+    # NUMERAL.optional()
 )
 
 COINS_INTEGER = and_(
@@ -408,7 +410,7 @@ RANGE_MIN = rule(
 )
 
 RANGE_MAX = rule(
-    eq('до').optional(),
+    #eq('до').optional(),
     RANGE_MONEY.interpretation(
         Range.max
     )
@@ -424,7 +426,7 @@ FORK = rule(dictionary({'fork', 'Вилка', 'ЗП', 'Оклад'}), eq(':').op
 RANGE = rule(
     FORK.optional(),
     RANGE_MIN,
-    DASH.optional(),
+    or_(DASH, eq('до')),  # раньше был DASH.optional(),
     RANGE_MAX,
     TAXATION.interpretation(Range.taxation).optional()
 ).interpretation(
@@ -433,7 +435,7 @@ RANGE = rule(
 
 
 class MoneyRangeExtractor(Extractor):
-    regex_digits_only = re.compile('^\d+\s?-\s?\d+$')
+    regex_digits_only = re.compile('^\d+\s?[\-–]\s?\d+$')
 
     def __init__(self):
         super(MoneyRangeExtractor, self).__init__(RANGE)
@@ -450,6 +452,7 @@ class MoneyRangeExtractor(Extractor):
             if 'fact' not in match:
                 continue
             start, end = match['span'][0], match['span'][1]
+            # Проверяем ложные срабатывания на неденежных интервалах
             if self.regex_digits_only.search(text[start:end]):
                 continue
             res.append(match)
