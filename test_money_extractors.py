@@ -1,4 +1,6 @@
 from money_extractors import MoneyRangeExtractor
+
+# TODO: сделать покрасивей, как в https://github.com/natasha/natasha/blob/46ac5e8b63974f96dcc9dd22864c47fa3912dc5c/natasha/tests/test_money_range.py
 # from natasha import MoneyRangeExtractor
 
 ext = MoneyRangeExtractor()
@@ -207,3 +209,20 @@ def test_fork():
     assert 'Вилка' in text[span[0]:span[1]]
 
 
+def test_implicit_thousand():
+    text = 'Оклад в вилке от 150 до 250 гросс'
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) != 0
+    match = matches[0]['fact']
+    assert match['min']['amount'] == 150000
+    assert match['min']['currency'] == 'RUB'
+    assert match['max']['amount'] == 250000
+    assert match['max']['currency'] == 'RUB'
+
+
+def test_single_int():
+    text = 'Более 20 000 сотрудников по всей России'
+    matches = ext(text).as_json
+    print(matches)
+    assert len(matches) == 0

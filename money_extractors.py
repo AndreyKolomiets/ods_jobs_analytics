@@ -1,5 +1,8 @@
 # coding: utf-8
-# TODO: для вилок типа 150-250 без к и валюты должно быть слово "вилка" или "fork" поблизости
+# TODO: повторить все для шила
+# TODO: Подумать, как раскидать вилки по должностям, если их несколько.
+#  Например, упорядочить уровни по возрастанию зп (сеньор больше миддла и т.п.)
+#  Если такого нет, то можно раскидать к ближайшим (определяется по спану)
 from __future__ import unicode_literals, division
 
 import re
@@ -19,9 +22,7 @@ from yargy.predicates import (
     gram, type,
     normalized, caseless, dictionary
 )
-from yargy.pipelines import morph_pipeline, caseless_pipeline
-
-from natasha.utils import Record
+from yargy.pipelines import caseless_pipeline
 
 from natasha.extractors import Extractor
 
@@ -87,6 +88,10 @@ class Range(Range, Normalizable):
             min.currency = max.currency
         elif min.currency != max.currency:
             min.currency = max.currency
+        # для рублевых вилок типа 150-250 без указания тысяч домножаем на тысячу
+        if (max.amount < 1000) and (min.amount < 1000) and (max.currency == 'RUB'):
+            min.amount *= 1000
+            max.amount *= 1000
         return dsl.Range(min, max)
 
 
@@ -146,7 +151,7 @@ CURRENCY = or_(
 ).interpretation(
     Money.currency
 )
-
+# TODO: копейки и центы тоже можно выпилить для ускорения
 KOPEIKA = or_(
     rule(normalized('копейка')),
     rule(
@@ -177,7 +182,7 @@ COINS_CURRENCY = or_(
 #
 ##########
 
-
+# TODO: можно выпилить, чтобы шустрее работало
 MILLIARD = or_(
     rule(caseless('млрд'), DOT.optional()),
     rule(normalized('миллиард'))
@@ -246,7 +251,7 @@ PART = or_(
     CURRENCY,
     COINS_CURRENCY
 )
-
+# TODO: вот здесь можно поправить, чтобы телефоны не парсились
 BOUND = in_('()//')
 
 NUMERAL = rule(
