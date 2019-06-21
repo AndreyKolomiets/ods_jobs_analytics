@@ -90,6 +90,8 @@ class Range(Range, Normalizable):
                 max.amount *= 1000
         if not min.currency:
             min.currency = max.currency
+        # if (min.currency is not None) and (min.currency != 'RUB') and (max.currency is not None):
+        #     max.currency
         elif min.currency != max.currency:
             min.currency = max.currency
         # для рублевых вилок типа 150-250 без указания тысяч домножаем на тысячу

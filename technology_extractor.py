@@ -8,7 +8,7 @@ language_patterns = {'scala': 'scala', 'java': 'java', 'джав[аоуе]й?': 
                      'python': 'python', 'питон[ауео]?м?': 'python', '[cс]#': 'c#', 'sql': 'sql',
                      'golang': 'golang', 'matlab': 'matlab', 'матлаб[ауео]?м?': 'matlab',
                      '[\s]R[,.\s/]': 'r', '(javascript|джаваскрипт[ауео]?м?)': 'javascript',
-                     '(kotlin|котлин[ауео]?м?)': 'kotlin', 'cuda':'cuda'}
+                     '(kotlin|котлин[ауео]?м?)': 'kotlin', 'cuda':'cuda', 'php': 'php'}
 
 pattern_emojis = {re.compile(pattern): normalized for pattern, normalized in lang_emojis.items()}
 
