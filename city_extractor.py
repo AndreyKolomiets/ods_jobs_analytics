@@ -19,6 +19,8 @@ from yargy import Parser
 
 from typing import Set, List, Tuple
 from natasha import NamesExtractor
+import spacy
+import en_core_web_sm
 
 Location = fact(
     'Location',
@@ -26,7 +28,7 @@ Location = fact(
 )
 
 gnc = gnc_relation()
-
+# TODO: можно докинуть правило для станций московского и питерского метро
 LOCALITY = rule(
     and_(
         dictionary({
@@ -90,10 +92,12 @@ class CustomLocationExtractor(Extractor):
     country_emoji_regex = re.compile('flag-(\w+)')
     flags_exceptions = {'ru', 'es', 'us', 'fr', 'gb', 'de', 'uk', 'belarusparrot', 'russiaparrot'}
     flags_exception_emojis = {':{}:'.format(_) for _ in flags_exceptions}
+    regex_remote = re.compile('(удал[её]нная работа|работа удал[её]нная|remote job|удал[её]нка)', re.IGNORECASE)
 
     def __init__(self):
         super(CustomLocationExtractor, self).__init__(LOCATION)
         self.name_ext = NamesExtractor()
+        self.spacy_extractor = en_core_web_sm.load()
 
     def parse_emojis(self, message: dict):
         reactions = {reaction['name'] for reaction in message.get('reactions', [])}
@@ -134,4 +138,8 @@ class CustomLocationExtractor(Extractor):
             res.append(match['fact']['name'])
 
         res.extend(self.cities_from_emojis(message))
+        if (len(res) == 0) and (self.regex_remote.search(text)):
+            res.append('remote')
+        english_matches = [match.text for match in self.spacy_extractor(text).ents if match.label_ == 'GPE']
+        res.extend(english_matches)
         return res
