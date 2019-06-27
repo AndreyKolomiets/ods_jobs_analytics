@@ -1,4 +1,4 @@
-from city_extractor import CustomLocationExtractor
+from city_extractor import CustomLocationExtractor, MosmetroExtractor
 import pytest
 
 
@@ -12,6 +12,7 @@ cases_city = [('Москва', 'москва'),
               ("Вакансия: data scientist (stealth mode startup в области real estate), удаленная работа", "remote"),
               ("Работа в офисе в Москве или удаленка", "москва"),
               ('Location: New York', 'New York'),
+              ("офис расположен на м. Парк Культуры", "москва")
               ]
 
 cases_not_city = ['кампания',
@@ -22,6 +23,22 @@ cases_not_city = ['кампания',
                   'Контактное лицо - Виктория Иванова',
                   'echo.msk.ru',
                   "Разработка программного обеспечения"]
+
+cases_metro = [('офис расположен на м. Арбатская', 'Арбатская'),
+               ('расположение: метро Парк Культуры', 'Парк Культуры')]
+
+
+@pytest.fixture(scope='module')
+def metro_extractor():
+    return MosmetroExtractor()
+
+
+@pytest.mark.parametrize('test', cases_metro)
+def test_mosmetro(metro_extractor, test):
+    line, etalon = test
+    matches = metro_extractor(line)
+    assert len(matches) == 1
+    assert matches[0].fact.name == etalon
 
 
 @pytest.fixture(scope='module')

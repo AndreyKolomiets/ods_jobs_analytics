@@ -8,9 +8,10 @@ from yargy import (
 )
 from yargy.interpretation import fact
 from yargy.predicates import (
-    gram, dictionary, is_capitalized
+    gram, dictionary, is_capitalized, eq
 )
 from yargy.relations import gnc_relation
+from yargy.pipelines import morph_pipeline
 
 from natasha.tokenizer import TOKENIZER
 from natasha.preprocess import normalize_text
@@ -19,8 +20,27 @@ from yargy import Parser
 
 from typing import Set, List, Tuple
 from natasha import NamesExtractor
-import spacy
+import pandas as pd
+import os
 import en_core_web_sm
+
+
+def get_mosmetro_stations():
+    path = os.path.abspath(os.path.dirname(__file__))
+    df = pd.read_csv(path+'/mosmetro.csv', encoding='utf-8')
+    stations = df[df.Status == 'действует'].Station.values
+    return stations
+
+
+stations = get_mosmetro_stations()
+
+Mosmetro = fact('mosmetro', ['name'])
+
+MOSMETRO = rule(
+    or_(rule(eq('метро')),
+        rule(eq('м'), eq('.'))),
+    morph_pipeline(stations).interpretation(Mosmetro.name)
+).interpretation(Mosmetro)
 
 Location = fact(
     'Location',
@@ -98,6 +118,7 @@ class CustomLocationExtractor(Extractor):
         super(CustomLocationExtractor, self).__init__(LOCATION)
         self.name_ext = NamesExtractor()
         self.spacy_extractor = en_core_web_sm.load()
+        self.mosmetro_ext = MosmetroExtractor()
 
     def parse_emojis(self, message: dict):
         reactions = {reaction['name'] for reaction in message.get('reactions', [])}
@@ -138,8 +159,17 @@ class CustomLocationExtractor(Extractor):
             res.append(match['fact']['name'])
 
         res.extend(self.cities_from_emojis(message))
-        if (len(res) == 0) and (self.regex_remote.search(text)):
-            res.append('remote')
+
         english_matches = [match.text for match in self.spacy_extractor(text).ents if match.label_ == 'GPE']
         res.extend(english_matches)
+        if len(res) == 0:
+            if self.regex_remote.search(text):
+                res.append('remote')
+            elif len(self.mosmetro_ext(text)) > 0:
+                res.append('москва')
         return res
+
+
+class MosmetroExtractor(Extractor):
+    def __init__(self):
+        super(MosmetroExtractor, self).__init__(MOSMETRO)
