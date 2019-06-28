@@ -1,21 +1,13 @@
-import re
-
 from yargy import (
-    rule,
-    and_, or_,
+    rule, or_,
 )
 from yargy.interpretation import (
-    fact,
-    const,
-    attribute
+    fact
 )
 from yargy.predicates import (
-    eq, length_eq,
-    in_, in_caseless,
-    gram, type,
-    normalized, caseless, dictionary, is_capitalized
+    dictionary, is_capitalized
 )
-from yargy.pipelines import morph_pipeline, caseless_pipeline
+from yargy.pipelines import caseless_pipeline
 
 from natasha.extractors import Extractor
 

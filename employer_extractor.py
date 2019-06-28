@@ -1,6 +1,4 @@
 import re
-from typing import List, Pattern
-
 
 patterns = ['\w+\.ai',
             '([A-Za-z]+\s)+(ищет|(is)? looking for|seeks for)',

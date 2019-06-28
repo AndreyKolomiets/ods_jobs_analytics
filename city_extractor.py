@@ -28,8 +28,7 @@ import en_core_web_sm
 def get_mosmetro_stations():
     path = os.path.abspath(os.path.dirname(__file__))
     df = pd.read_csv(path+'/mosmetro.csv', encoding='utf-8')
-    stations = df[df.Status == 'действует'].Station.values
-    return stations
+    return df[df.Status == 'действует'].Station.values
 
 
 stations = get_mosmetro_stations()
@@ -120,6 +119,7 @@ class CustomLocationExtractor(Extractor):
         self.spacy_extractor = en_core_web_sm.load()
         self.mosmetro_ext = MosmetroExtractor()
 
+    # TODO: пока не доделано
     def parse_emojis(self, message: dict):
         reactions = {reaction['name'] for reaction in message.get('reactions', [])}
         flag_names = []
@@ -141,7 +141,7 @@ class CustomLocationExtractor(Extractor):
                 cities.add(value)
         return cities
 
-    def extract(self, message: dict) -> List[str]:
+    def extract(self, message: dict, use_spacy=False) -> List[str]:
         text = message['text']
         matches = self(text).as_json
         name_matches = self.name_ext(text).as_json
@@ -159,9 +159,9 @@ class CustomLocationExtractor(Extractor):
             res.append(match['fact']['name'])
 
         res.extend(self.cities_from_emojis(message))
-
-        english_matches = [match.text for match in self.spacy_extractor(text).ents if match.label_ == 'GPE']
-        res.extend(english_matches)
+        if use_spacy:
+            english_matches = [match.text for match in self.spacy_extractor(text).ents if match.label_ == 'GPE']
+            res.extend(english_matches)
         if len(res) == 0:
             if self.regex_remote.search(text):
                 res.append('remote')
