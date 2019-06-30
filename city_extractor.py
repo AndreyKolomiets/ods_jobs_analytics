@@ -47,7 +47,6 @@ Location = fact(
 )
 
 gnc = gnc_relation()
-# TODO: можно докинуть правило для станций московского и питерского метро
 LOCALITY = rule(
     and_(
         dictionary({
@@ -112,6 +111,7 @@ class CustomLocationExtractor(Extractor):
     flags_exceptions = {'ru', 'es', 'us', 'fr', 'gb', 'de', 'uk', 'belarusparrot', 'russiaparrot'}
     flags_exception_emojis = {':{}:'.format(_) for _ in flags_exceptions}
     regex_remote = re.compile('(удал[её]нная работа|работа удал[её]нная|remote job|удал[её]нка)', re.IGNORECASE)
+    easy_pattern = re.compile('(?:город|city|location|локация|расположение)\s?:\s+([\w\- ]+)', re.IGNORECASE)
 
     def __init__(self):
         super(CustomLocationExtractor, self).__init__(LOCATION)
@@ -143,6 +143,9 @@ class CustomLocationExtractor(Extractor):
 
     def extract(self, message: dict, use_spacy=False) -> List[str]:
         text = message['text']
+        x = self.easy_pattern.search(text)
+        if x:
+            return [x.group(1).lower()]
         matches = self(text).as_json
         name_matches = self.name_ext(text).as_json
         name_spans = [tuple(match['span']) for match in name_matches]
