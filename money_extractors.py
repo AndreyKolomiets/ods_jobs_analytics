@@ -445,7 +445,7 @@ RANGE = rule(
 
 class MoneyRangeExtractor(Extractor):
     regex_digits_only = re.compile('^\d+\s?(-|–|до)\s?\d+$')
-    regex_link = re.compile('<.+>')
+    regex_link = re.compile('<[^>]+>')
 
     def __init__(self):
         super(MoneyRangeExtractor, self).__init__(RANGE)
