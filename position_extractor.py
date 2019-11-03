@@ -19,16 +19,20 @@ LEVEL = rule(caseless_pipeline(['junior', 'middle', 'senior',
                                 "руководитель направления"]).interpretation(Position.level))
 
 # TODO: нужно учесть жаргонные варианты (датасаентолог, датасатанист и т.д.) Скорее всего, придется парсить регулярками
+# TODO: бывает множественное число для английских слов
 NAME = rule(or_(caseless_pipeline(['data scientist', 'data engineer', 'engineer',
                                    'analyst', 'data analyst',
                                    'data manager', 'scientist', 'researcher',
                                    "developer",
-                                   "intern"]),
+                                   "intern",
+                                   "specialist"]),
                 rule(dictionary(['DS', 'DE']), is_capitalized()),
-                morph_pipeline(["аналитик", "разработчик", "стажер"])).interpretation(Position.name.inflected()))
+                morph_pipeline(["аналитик", "разработчик",
+                                "стажер", "специалист",
+                                "инженер"])).interpretation(Position.name.inflected()))
 
 FIELD = rule(caseless_pipeline(['ML', 'DL', 'CV', 'computer vision', 'NLP', 'bi',
-                                'machine learning', 'deep learning',
+                                'machine learning', 'deep learning', 'ml', 'dl',
                                 'software', 'research', 'big data',
                                 'python', 'c++', "scala", "java",
                                 'ios', "android", 'devops',

@@ -80,6 +80,8 @@ Range = fact(
 class Range(Range, Normalizable):
     @property
     def normalized(self):
+        # if self.max.multiplier and not self.min.multiplier:
+        #     self.min.multiplier = self.max.multiplier
         min = self.min.normalized
         max = self.max.normalized
         # Приводим к одному масштабу (для вилок типа 150-250 т.р.)
@@ -443,6 +445,7 @@ RANGE = rule(
 
 class MoneyRangeExtractor(Extractor):
     regex_digits_only = re.compile('^\d+\s?(-|–|до)\s?\d+$')
+    regex_link = re.compile('<.+>')
 
     def __init__(self):
         super(MoneyRangeExtractor, self).__init__(RANGE)
@@ -453,6 +456,7 @@ class MoneyRangeExtractor(Extractor):
         :param text:
         :return:
         """
+        text = self.regex_link.sub('', text)
         matches = self(text).as_json
         res = []
         for match in matches:
@@ -464,4 +468,3 @@ class MoneyRangeExtractor(Extractor):
                 continue
             res.append(match)
         return res
-
