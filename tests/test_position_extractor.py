@@ -1,4 +1,4 @@
-from position_extractor import PositionExtractor
+from extractors.position_extractor import PositionExtractor
 
 ext = PositionExtractor()
 

@@ -1,4 +1,4 @@
-from money_extractors import MoneyRangeExtractor
+from extractors.money_extractors import MoneyRangeExtractor
 import pytest
 
 # ['от 60К до 300К', '120т.р. - 160 т.р.',

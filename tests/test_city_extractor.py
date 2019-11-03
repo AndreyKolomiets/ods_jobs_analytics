@@ -1,4 +1,4 @@
-from city_extractor import CustomLocationExtractor, MosmetroExtractor
+from extractors.city_extractor import CustomLocationExtractor, MosmetroExtractor
 import pytest
 
 
