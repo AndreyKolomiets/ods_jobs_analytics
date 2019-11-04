@@ -351,8 +351,8 @@ COINS_AMOUNT = rule(
 MONEY = rule(
     AMOUNT,
     CURRENCY,
-    COINS_AMOUNT.optional(),
-    COINS_CURRENCY.optional()
+    # COINS_AMOUNT.optional(),
+    # COINS_CURRENCY.optional()
 ).interpretation(
     Money
 )
@@ -446,6 +446,8 @@ RANGE = rule(
 class MoneyRangeExtractor(Extractor):
     regex_digits_only = re.compile('^\d+\s?(-|–|до)\s?\d+$')
     regex_link = re.compile('<[^>]+>')
+    currencies = {'$': 'USD',
+                  '€': 'EUR'}
 
     def __init__(self):
         super(MoneyRangeExtractor, self).__init__(RANGE)
@@ -466,5 +468,8 @@ class MoneyRangeExtractor(Extractor):
             # Проверяем ложные срабатывания на неденежных интервалах
             if self.regex_digits_only.search(text[start:end]):
                 continue
+            if text[start] in self.currencies:
+                match['fact']['min']['currency'] = self.currencies[text[start]]
+                match['fact']['max']['currency'] = self.currencies[text[start]]
             res.append(match)
         return res

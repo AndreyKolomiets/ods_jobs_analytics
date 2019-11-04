@@ -47,12 +47,16 @@ def extractor():
 
 @pytest.mark.parametrize('test', cases_fork)
 def test_fork_present(extractor, test):
+
     line, etalon = test
-    matches = list(extractor(line))
+    # TODO: переписать с методом extract
+    matches = list(extractor.extract(line))
     assert len(matches) == 1
-    fact = matches[0].fact
-    guess = str(fact.normalized)
-    assert guess == etalon
+    # fact = matches[0].fact
+    # guess = str(fact.normalized)
+    guess = f"{matches[0]['fact']['min']['amount']} {matches[0]['fact']['min']['currency']}-" \
+            f"{matches[0]['fact']['max']['amount']} {matches[0]['fact']['max']['currency']}"
+    assert etalon == guess
 
 
 @pytest.mark.parametrize('test', cases_not_fork)

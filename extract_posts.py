@@ -21,6 +21,12 @@ PATTERNS_TO_IGNORE = (
 
 def main(root: str,
          min_year: int) -> Tuple[List[Dict], List[Dict]]:
+    """
+    Извлечение постов с вакансиями
+    :param root:
+    :param min_year:
+    :return: список постов с вакансиями, список постов с дайджестами вакансий из #_top_jobs
+    """
     job_posts = []
     top_jobs = []
 
