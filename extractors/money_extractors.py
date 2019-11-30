@@ -443,6 +443,24 @@ RANGE = rule(
 )
 
 
+def parse_money_emojis(message: dict):
+    big_money_emojis = {"moneyparrot",
+                        "moneys",
+                        "moneybag",
+                        "money_with_wings",
+                        "printing-money",
+                        "money_mouth_face"}
+    small_money_emojis = {'ramen',
+                          'small'}
+    widefork_emojis = {'widefork',
+                       'rake2'}
+    reactions = {(reaction['name'], reaction['count']) for reaction in message.get('reactions', [])}
+    small_money_count = sum(count for name, count in reactions if name in small_money_emojis)
+    big_money_count = sum(count for name, count in reactions if name in big_money_emojis)
+    widefork_count = sum(count for name, count in reactions if name in widefork_emojis)
+    return small_money_count, big_money_count, widefork_count
+
+
 class MoneyRangeExtractor(Extractor):
     regex_digits_only = re.compile('^\d+\s?(-|–|до)\s?\d+$')
     regex_link = re.compile('<[^>]+>')
